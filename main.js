@@ -20,6 +20,7 @@ for(var x = 0; x < w; ++x) {
 }
 
 var canvas = document.getElementById('canvas');
+var slider = document.getElementById('slider');
 var ctx = canvas.getContext('2d');
 
 function clicked(event) {
@@ -166,6 +167,9 @@ function update() {
         hist.earliest_idx = wrap(hist.earliest_idx + 1, hist.size);
     }
 
+    slider.max = wrap(hist.size - hist.earliest_idx, hist.size) + hist.curr_idx;
+    slider.value = slider.max;
+
     if(!paused) {
         setTimeout(update, 0)
     }
@@ -174,9 +178,11 @@ function update() {
 function togglePause() {
     if(paused) {
         paused = false;
+        slider.disabled = true;
         update();
     } else {
         paused = true;
+        slider.disabled = false;
     }
 }
 
@@ -187,6 +193,7 @@ function previousState() {
     }
     hist.curr_idx = wrap(hist.curr_idx - 1, hist.size);
     current_world = hist.buffer[hist.curr_idx];
+    slider.value--;
     drawWorld();
 }
 
@@ -200,6 +207,13 @@ function nextState() {
         return;
     }
     hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
+    current_world = hist.buffer[hist.curr_idx];
+    slider.value++;
+    drawWorld();
+}
+
+function sliderChange() {
+    hist.curr_idx = wrap(hist.earliest_idx + parseInt(slider.value), hist.size);
     current_world = hist.buffer[hist.curr_idx];
     drawWorld();
 }
@@ -219,4 +233,5 @@ function setUpDefaultWorld() {
 
 //init
 setUpDefaultWorld();
+hist.buffer[0] = current_world;
 drawWorld();
