@@ -20,11 +20,8 @@ function relMouseCoords(event){
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
 //////////////////////
 
-function clampx(x) {
-    return (x + w) % w;
-}
-function clampy(y) {
-    return (y + h) % h;
+function wrap(a, size) {
+    return (a + size) % size;
 }
 
 
@@ -56,6 +53,7 @@ function clicked(event) {
     current_world[x][y] = letter;
     drawCell(x, y, letter);
 
+    latest_history_idx = curr_history_idx;
 }
 canvas.addEventListener('click', clicked, false);
 
@@ -73,8 +71,8 @@ function cellMatchesRule(cell_contents, rule_contents) {
 function ruleTriggered(rule, dwarf, old_world) {
     for (var xd = -2; xd <= 2; ++xd) {
         for(var yd = -2; yd <= 2; ++yd) {
-            var grid_x = clampx(dwarf.x + xd);
-            var grid_y = clampy(dwarf.y + yd);
+            var grid_x = wrap(dwarf.x + xd, w);
+            var grid_y = wrap(dwarf.y + yd, h);
             var cell_contents = old_world[grid_x][grid_y];
             var rule_contents = rule.pattern.charAt((xd + 2) + ((yd + 2) * 5));
             if (!cellMatchesRule(cell_contents, rule_contents)) {
@@ -102,8 +100,8 @@ function applyOutcome(rule, dwarf, new_world, old_world) {
             if(new_letter == 'O') {
                 new_letter = dwarf.letter;
             }
-            var grid_x = clampx(dwarf.x + xd);
-            var grid_y = clampy(dwarf.y + yd);
+            var grid_x = wrap(dwarf.x + xd, w);
+            var grid_y = wrap(dwarf.y + yd, h);
             var old_cell = old_world[grid_x][grid_y];
             var new_cell = new_world[grid_x][grid_y];
             if(old_cell != new_cell) {
@@ -145,26 +143,39 @@ function drawCell(x, y, letter) {
     ctx.fillStyle = colorsByLetter[letter];
     ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size)
 }
+// manually handle a circular buffer for history
+var history_size = 500;
+var history_buffer = new Array(history_size);
+var curr_history_idx = 0;
+var earliest_history_idx = 0;
+var latest_history_idx = 0;
 
 function update() {
     dwarves = [];
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             var letter = current_world[x][y];
-
             if (letter == "G" || letter == "D") {
                 dwarves.push({"x": x, "y": y, "letter": letter});
             }
-            drawCell(x, y, letter);
         }
     }
     new_world = makeNewWorld(dwarves, current_world);
     current_world = new_world;
+    drawWorld();
+
+    curr_history_idx = wrap(curr_history_idx + 1, history_size);
+    history_buffer[curr_history_idx] = current_world;
+
+    latest_history_idx = curr_history_idx;
+    if (curr_history_idx == earliest_history_idx) {
+        earliest_history_idx = wrap(earliest_history_idx + 1, history_size);
+    }
+
     if(!paused) {
         setTimeout(update, 0)
     }
 }
-
 
 function togglePause() {
     if(paused) {
@@ -175,8 +186,42 @@ function togglePause() {
     }
 }
 
+
+function drawWorld() {
+    for (var x = 0; x < w; ++x) {
+        for (var y = 0; y < h; ++y) {
+            var letter = current_world[x][y];
+            drawCell(x, y, letter);
+        }
+    }
+}
+
+function previousState() {
+    if(!paused || curr_history_idx == earliest_history_idx) {
+        return;
+    }
+    curr_history_idx = wrap(curr_history_idx - 1, history_size);
+    current_world = history_buffer[curr_history_idx];
+    drawWorld();
+}
+
+function nextState() {
+    if(!paused) {
+        return;
+    }
+
+    if(curr_history_idx == latest_history_idx) {
+        update();
+        return;
+    }
+    curr_history_idx = wrap(curr_history_idx + 1, history_size);
+    current_world = history_buffer[curr_history_idx];
+    drawWorld();
+}
+
 for(var i =0; i < w; ++i) {
     current_world[i][h-3] = 'S';
 }
 current_world[75][h-4] = 'G';
-update();
+
+drawWorld();
