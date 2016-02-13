@@ -65,7 +65,14 @@ function ruleTriggered(rule, dwarf, old_world) {
     return true;
 }
 
-function applyOutcome(rule, dwarf, new_world) {
+function priority(a, b) {
+    if (a == 'G' || b == 'G') return 'G';
+    if (a == 'D' || b == 'D') return 'D';
+    if (a == 'S' || b == 'S') return 'S';
+    return '_';
+}
+
+function applyOutcome(rule, dwarf, new_world, old_world) {
     for (var xd = -2; xd <= 2; ++xd) {
         for(var yd = -2; yd <= 2; ++yd) {
             var new_letter = rule.outcome.charAt((xd + 2) + ((yd + 2) * 5));
@@ -77,6 +84,11 @@ function applyOutcome(rule, dwarf, new_world) {
             }
             var grid_x = clampx(dwarf.x + xd);
             var grid_y = clampy(dwarf.y + yd);
+            var old_cell = old_world[grid_x][grid_y];
+            var new_cell = new_world[grid_x][grid_y];
+            if(old_cell != new_cell) {
+                new_letter = priority(old_cell, new_cell);
+            }
             new_world[grid_x][grid_y] = new_letter;
         }
     }
@@ -86,7 +98,7 @@ function advanceDwarf(dwarf, old_world, new_world) {
     for (var i = 0; i < rules.length; ++i) {
         var rule = rules[i];
         if (ruleTriggered(rule, dwarf, old_world)) {
-            applyOutcome(rule, dwarf, new_world)
+            applyOutcome(rule, dwarf, new_world, old_world)
             return;
         }
     }
