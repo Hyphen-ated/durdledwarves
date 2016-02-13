@@ -18,7 +18,7 @@ function relMouseCoords(event){
     return {x:canvasX, y:canvasY}
 }
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
-
+//////////////////////
 
 function clampx(x) {
     return (x + w) % w;
@@ -40,10 +40,24 @@ for(var x = 0; x < w; ++x) {
     }
 }
 
-var paused = false;
+var paused = true;
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
+
+function clicked(event) {
+    if(!paused) {
+        return;
+    }
+    var pos = canvas.relMouseCoords(event);
+    var x = Math.floor(pos.x / cell_size);
+    var y = Math.floor(pos.y / cell_size);
+    var letter = $('input[name=clickAddition]:checked').val();
+    current_world[x][y] = letter;
+    drawCell(x, y, letter);
+
+}
+canvas.addEventListener('click', clicked, false);
 
 function cellMatchesRule(cell_contents, rule_contents) {
     if (rule_contents == '*' || rule_contents == 'O') {
@@ -127,23 +141,39 @@ var colorsByLetter = {
     "S": "#999999"
 }
 
+function drawCell(x, y, letter) {
+    ctx.fillStyle = colorsByLetter[letter];
+    ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size)
+}
+
 function update() {
     dwarves = [];
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             var letter = current_world[x][y];
-            ctx.fillStyle = colorsByLetter[letter];
+
             if (letter == "G" || letter == "D") {
                 dwarves.push({"x": x, "y": y, "letter": letter});
             }
-            ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size)
+            drawCell(x, y, letter);
         }
     }
     new_world = makeNewWorld(dwarves, current_world);
     current_world = new_world;
-    setTimeout(update, 0)
+    if(!paused) {
+        setTimeout(update, 0)
+    }
 }
 
+
+function togglePause() {
+    if(paused) {
+        paused = false;
+        update();
+    } else {
+        paused = true;
+    }
+}
 
 for(var i =0; i < w; ++i) {
     current_world[i][h-3] = 'S';
