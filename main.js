@@ -20,6 +20,12 @@ function relMouseCoords(event){
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
 
 
+function clampx(x) {
+    return (x + w) % w;
+}
+function clampy(y) {
+    return (y + h) % h;
+}
 
 
 var w = 150;

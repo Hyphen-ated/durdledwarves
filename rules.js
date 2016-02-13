@@ -1,10 +1,3 @@
-function clampx(x) {
-    return (x + w) % w;
-}
-function clampy(y) {
-    return (y + h) % h;
-}
-
 rules = [
 {
     //                  1
