@@ -1,33 +1,15 @@
-// thing from stackoverflow to make it easy to get mouse position on canvas
-function relMouseCoords(event){
-    var totalOffsetX = 0;
-    var totalOffsetY = 0;
-    var canvasX = 0;
-    var canvasY = 0;
-    var currentElement = this;
-
-    do{
-        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
-        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
-    }
-    while(currentElement = currentElement.offsetParent)
-
-    canvasX = event.pageX - totalOffsetX;
-    canvasY = event.pageY - totalOffsetY;
-
-    return {x:canvasX, y:canvasY}
-}
-HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
-//////////////////////
+// this is an implementation of
 
 function wrap(a, size) {
     return (a + size) % size;
 }
 
-
+//some nice little global state
 var w = 150;
 var h = 150;
 var cell_size = 5;
+var paused = true;
+
 
 var current_world = new Array(w);
 for(var x = 0; x < w; ++x) {
@@ -37,12 +19,11 @@ for(var x = 0; x < w; ++x) {
     }
 }
 
-var paused = true;
-
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 function clicked(event) {
+    //clicking modifies the world, but only when paused.
     if(!paused) {
         return;
     }
@@ -69,6 +50,7 @@ function cellMatchesRule(cell_contents, rule_contents) {
 }
 
 function ruleTriggered(rule, dwarf, old_world) {
+    //check the 5x5 grid of the rule against the world. if they all match, then we trigger
     for (var xd = -2; xd <= 2; ++xd) {
         for(var yd = -2; yd <= 2; ++yd) {
             var grid_x = wrap(dwarf.x + xd, w);
@@ -144,14 +126,23 @@ function drawCell(x, y, letter) {
     ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size)
 }
 
+function drawWorld() {
+    for (var x = 0; x < w; ++x) {
+        for (var y = 0; y < h; ++y) {
+            var letter = current_world[x][y];
+            drawCell(x, y, letter);
+        }
+    }
+}
 
-// manually handle a circular buffer for hist
+// manually handle a circular buffer for history
 var hist = {
     size: 500,
     buffer: new Array(500),
-    curr_idx: 0,
-    earliest_idx: 0,
-    latest_idx: 0
+    curr_idx: 0, //the index into buffer where current_state goes
+    earliest_idx: 0, // chronologically earliest of the states in buffer
+    latest_idx: 0 // chronologically latest of the states in buffer
+    //the current state can be different from the latest state if we're doing rewinding
 }
 
 function update() {
@@ -190,15 +181,6 @@ function togglePause() {
 }
 
 
-function drawWorld() {
-    for (var x = 0; x < w; ++x) {
-        for (var y = 0; y < h; ++y) {
-            var letter = current_world[x][y];
-            drawCell(x, y, letter);
-        }
-    }
-}
-
 function previousState() {
     if(!paused || hist.curr_idx == hist.earliest_idx) {
         return;
@@ -212,7 +194,7 @@ function nextState() {
     if(!paused) {
         return;
     }
-
+    //if we have no more precomputed history to advance, then compute a new state
     if(hist.curr_idx == hist.latest_idx) {
         update();
         return;
@@ -222,9 +204,19 @@ function nextState() {
     drawWorld();
 }
 
-for(var i =0; i < w; ++i) {
-    current_world[i][h-3] = 'S';
-}
-current_world[75][h-4] = 'G';
+function setUpDefaultWorld() {
+    for(var x = 0; x < w; ++x) {
+        for (var y = 0; y < h; ++y) {
+            current_world[x][y] = '_';
+        }
+    }
 
+    for(var i =0; i < w; ++i) {
+        current_world[i][h-1] = 'S';
+    }
+    current_world[75][h-2] = 'G';
+}
+
+//init
+setUpDefaultWorld();
 drawWorld();
