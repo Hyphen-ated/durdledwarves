@@ -141,6 +141,7 @@ function update() {
     }
     new_world = makeNewWorld(dwarves, current_world);
     current_world = new_world;
+    setTimeout(update, 0)
 }
 
 
@@ -149,4 +150,3 @@ for(var i =0; i < w; ++i) {
 }
 current_world[75][h-4] = 'G';
 update();
-setInterval(update, 1000);
