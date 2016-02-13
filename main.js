@@ -53,7 +53,7 @@ function clicked(event) {
     current_world[x][y] = letter;
     drawCell(x, y, letter);
 
-    latest_history_idx = curr_history_idx;
+    hist.latest_idx = hist.curr_idx;
 }
 canvas.addEventListener('click', clicked, false);
 
@@ -143,12 +143,16 @@ function drawCell(x, y, letter) {
     ctx.fillStyle = colorsByLetter[letter];
     ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size)
 }
-// manually handle a circular buffer for history
-var history_size = 500;
-var history_buffer = new Array(history_size);
-var curr_history_idx = 0;
-var earliest_history_idx = 0;
-var latest_history_idx = 0;
+
+
+// manually handle a circular buffer for hist
+var hist = {
+    size: 500,
+    buffer: new Array(500),
+    curr_idx: 0,
+    earliest_idx: 0,
+    latest_idx: 0
+}
 
 function update() {
     dwarves = [];
@@ -160,16 +164,15 @@ function update() {
             }
         }
     }
-    new_world = makeNewWorld(dwarves, current_world);
-    current_world = new_world;
+    current_world = makeNewWorld(dwarves, current_world);
     drawWorld();
 
-    curr_history_idx = wrap(curr_history_idx + 1, history_size);
-    history_buffer[curr_history_idx] = current_world;
+    hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
+    hist.buffer[hist.curr_idx] = current_world;
 
-    latest_history_idx = curr_history_idx;
-    if (curr_history_idx == earliest_history_idx) {
-        earliest_history_idx = wrap(earliest_history_idx + 1, history_size);
+    hist.latest_idx = hist.curr_idx;
+    if (hist.curr_idx == hist.earliest_idx) {
+        hist.earliest_idx = wrap(hist.earliest_idx + 1, hist.size);
     }
 
     if(!paused) {
@@ -197,11 +200,11 @@ function drawWorld() {
 }
 
 function previousState() {
-    if(!paused || curr_history_idx == earliest_history_idx) {
+    if(!paused || hist.curr_idx == hist.earliest_idx) {
         return;
     }
-    curr_history_idx = wrap(curr_history_idx - 1, history_size);
-    current_world = history_buffer[curr_history_idx];
+    hist.curr_idx = wrap(hist.curr_idx - 1, hist.size);
+    current_world = hist.buffer[hist.curr_idx];
     drawWorld();
 }
 
@@ -210,12 +213,12 @@ function nextState() {
         return;
     }
 
-    if(curr_history_idx == latest_history_idx) {
+    if(hist.curr_idx == hist.latest_idx) {
         update();
         return;
     }
-    curr_history_idx = wrap(curr_history_idx + 1, history_size);
-    current_world = history_buffer[curr_history_idx];
+    hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
+    current_world = hist.buffer[hist.curr_idx];
     drawWorld();
 }
 
