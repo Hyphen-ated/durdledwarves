@@ -107,7 +107,7 @@ function applyOutcome(rule, dwarf, new_world, old_world) {
             var old_cell = old_world[grid_x][grid_y];
             var new_cell = new_world[grid_x][grid_y];
             if(old_cell != new_cell) {
-                new_letter = priority(old_cell, new_cell);
+                new_letter = priority(new_letter, new_cell);
             }
             new_world[grid_x][grid_y] = new_letter;
         }
