@@ -138,12 +138,14 @@ function advanceDwarf(dwarf, old_world, new_template) {
     }
 }
 
-function applyTemplate(new_template, world) {
+function applyTemplate(old_world, new_world, new_template) {
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             var new_letter = new_template[x][y];
-            if(new_letter) {
-                world[x][y] = new_letter;
+            if(new_letter != null) {
+                new_world[x][y] = new_letter;
+            } else {
+                new_world[x][y] = old_world[x][y];
             }
             new_template[x][y] = null;
         }
@@ -151,14 +153,11 @@ function applyTemplate(new_template, world) {
 }
 
 
-function makeNewWorld(dwarves, old_world, new_template) {
-
-    //deep copy nested arrays
-    var new_world = $.extend(true, [], old_world);
+function makeNewWorld(dwarves, old_world, new_world, new_template) {
     for (var i = 0; i < dwarves.length; ++i) {
         advanceDwarf(dwarves[i], old_world, new_template);
     }
-    applyTemplate(new_template, new_world);
+    applyTemplate(old_world, new_world, new_template);
     return new_world;
 }
 
@@ -171,11 +170,15 @@ colorsByLetter[id["S"]] = "#999999";
 
 
 function drawCell(x, y, letter) {
-    ctx.fillStyle = colorsByLetter[letter];
-    ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size)
+    if(letter != id["_"]) {
+        ctx.fillStyle = colorsByLetter[letter];
+        ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
+    }
 }
 
 function drawWorld() {
+    ctx.fillStyle = colorsByLetter[id["_"]];
+    ctx.fillRect(0, 0, w * cell_size, h * cell_size);
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             var letter = current_world[x][y];
@@ -186,14 +189,17 @@ function drawWorld() {
 
 // manually handle a circular buffer for history
 var hist = {
-    size: 500,
-    buffer: new Array(500),
+    size: 100,
+    buffer: new Array(100),
     curr_idx: 0, //the index into buffer where current_state goes
     earliest_idx: 0, // chronologically earliest of the states in buffer
     latest_idx: 0, // chronologically latest of the states in buffer
     //the current state can be different from the latest state if we're doing rewinding
-
     curr_gen_number: 0
+}
+
+for(var i = 0; i < hist.size; ++i) {
+    hist.buffer[i] = $.extend(true, [], current_world);
 }
 
 var time_since_render = 9999;
@@ -207,7 +213,19 @@ function update() {
             }
         }
     }
-    current_world = makeNewWorld(dwarves, current_world, template_buffer);
+
+    hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
+
+
+    hist.latest_idx = hist.curr_idx;
+    if (hist.curr_idx == hist.earliest_idx) {
+        hist.earliest_idx = wrap(hist.earliest_idx + 1, hist.size);
+    }
+
+    var new_world_buffer = hist.buffer[hist.curr_idx];
+    current_world = makeNewWorld(dwarves, current_world, new_world_buffer, template_buffer);
+    hist.buffer[hist.curr_idx] = current_world;
+
     if (time_since_render > frameskip) {
         drawWorld();
         time_since_render = 1;
@@ -215,13 +233,6 @@ function update() {
         ++time_since_render;
     }
 
-    hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
-    hist.buffer[hist.curr_idx] = current_world;
-
-    hist.latest_idx = hist.curr_idx;
-    if (hist.curr_idx == hist.earliest_idx) {
-        hist.earliest_idx = wrap(hist.earliest_idx + 1, hist.size);
-    }
 
     slider.max = wrap(hist.size - hist.earliest_idx, hist.size) + hist.curr_idx;
     slider.value = slider.max;
