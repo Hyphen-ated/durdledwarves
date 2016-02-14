@@ -18,6 +18,11 @@ for(var x = 0; x < w; ++x) {
         current_world[x][y] = '_';
     }
 }
+var template_buffer = new Array(w);
+for(var x = 0; x < w; ++x) {
+    template_buffer[x] = new Array(h);
+    template_buffer[x].fill(null);
+}
 
 var canvas = document.getElementById('canvas');
 var slider = document.getElementById('slider');
@@ -73,7 +78,7 @@ function priority(a, b) {
     return '_';
 }
 
-function applyOutcome(rule, dwarf, new_world, old_world) {
+function applyOutcome(rule, dwarf, new_template) {
     for (var xd = -2; xd <= 2; ++xd) {
         for(var yd = -2; yd <= 2; ++yd) {
             var new_letter = rule.outcome.charAt((xd + 2) + ((yd + 2) * 5));
@@ -85,33 +90,43 @@ function applyOutcome(rule, dwarf, new_world, old_world) {
             }
             var grid_x = wrap(dwarf.x + xd, w);
             var grid_y = wrap(dwarf.y + yd, h);
-            var old_cell = old_world[grid_x][grid_y];
-            var new_cell = new_world[grid_x][grid_y];
-            if(old_cell != new_cell) {
-                new_letter = priority(new_letter, new_cell);
-            }
-            new_world[grid_x][grid_y] = new_letter;
+
+            new_template[grid_x][grid_y] = priority(new_letter, new_template[grid_x][grid_y]);
         }
     }
 }
 
-function advanceDwarf(dwarf, old_world, new_world) {
+function advanceDwarf(dwarf, old_world, new_template) {
     for (var i = 0; i < rules.length; ++i) {
         var rule = rules[i];
         if (ruleTriggered(rule, dwarf, old_world)) {
-            applyOutcome(rule, dwarf, new_world, old_world)
+            applyOutcome(rule, dwarf, new_template)
             return;
         }
     }
 }
 
+function applyTemplate(new_template, world) {
+    for (var x = 0; x < w; ++x) {
+        for (var y = 0; y < h; ++y) {
+            var new_letter = new_template[x][y];
+            if(new_letter) {
+                world[x][y] = new_letter;
+            }
+            new_template[x][y] = null;
+        }
+    }
+}
 
-function makeNewWorld(dwarves, old_world) {
+
+function makeNewWorld(dwarves, old_world, new_template) {
+
     //deep copy nested arrays
     var new_world = $.extend(true, [], old_world);
     for (var i = 0; i < dwarves.length; ++i) {
-        advanceDwarf(dwarves[i], old_world, new_world);
+        advanceDwarf(dwarves[i], old_world, new_template);
     }
+    applyTemplate(new_template, new_world);
     return new_world;
 }
 
@@ -156,7 +171,7 @@ function update() {
             }
         }
     }
-    current_world = makeNewWorld(dwarves, current_world);
+    current_world = makeNewWorld(dwarves, current_world, template_buffer);
     drawWorld();
 
     hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
