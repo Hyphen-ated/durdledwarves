@@ -1,4 +1,4 @@
-rules = [
+var rule_definitions = [
 {
     name: "Spawn on platform",
 
@@ -315,3 +315,21 @@ rules = [
 }
 
 ]
+
+//preprocess rule definitions so we have a list of which squares we care about
+var rules = [];
+
+for (var i = 0; i < rule_definitions.length; ++i) {
+    var defn = rule_definitions[i];
+    var new_pattern = [];
+    var new_outcome = [];
+    for (var s = 0; s < 25; ++s) {
+        if(defn.pattern[s] != "*" && defn.pattern[s] != "O") {
+            new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.pattern[s]});
+        }
+        if(defn.outcome[s] != "*") {
+            new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.outcome[s]});
+        }
+    }
+    rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
+}

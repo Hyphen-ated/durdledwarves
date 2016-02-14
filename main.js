@@ -1,4 +1,5 @@
-// this is an implementation of
+//durdle dwarves, a cellular automaton
+
 
 function wrap(a, size) {
     return (a + size) % size;
@@ -45,9 +46,6 @@ function clicked(event) {
 canvas.addEventListener('click', clicked, false);
 
 function cellMatchesRule(cell_contents, rule_contents) {
-    if (rule_contents == '*' || rule_contents == 'O') {
-        return true;
-    }
     // green dwarves count as regular dwarves
     if (cell_contents == 'G') {
         cell_contents = 'D';
@@ -56,16 +54,14 @@ function cellMatchesRule(cell_contents, rule_contents) {
 }
 
 function ruleTriggered(rule, dwarf, old_world) {
-    //check the 5x5 grid of the rule against the world. if they all match, then we trigger
-    for (var xd = -2; xd <= 2; ++xd) {
-        for(var yd = -2; yd <= 2; ++yd) {
-            var grid_x = wrap(dwarf.x + xd, w);
-            var grid_y = wrap(dwarf.y + yd, h);
-            var cell_contents = old_world[grid_x][grid_y];
-            var rule_contents = rule.pattern.charAt((xd + 2) + ((yd + 2) * 5));
-            if (!cellMatchesRule(cell_contents, rule_contents)) {
-                return false;
-            }
+    //each rule has a list of cells to check. if they all match, we trigger
+    for (var i = 0; i < rule.pattern.length; ++i) {
+        var rule_cell = rule.pattern[i];
+        var grid_x = wrap(dwarf.x + rule_cell.x, w);
+        var grid_y = wrap(dwarf.y + rule_cell.y, h);
+        var cell_contents = old_world[grid_x][grid_y];
+        if (!cellMatchesRule(cell_contents, rule_cell.val)) {
+            return false;
         }
     }
     return true;
@@ -79,20 +75,18 @@ function priority(a, b) {
 }
 
 function applyOutcome(rule, dwarf, new_template) {
-    for (var xd = -2; xd <= 2; ++xd) {
-        for(var yd = -2; yd <= 2; ++yd) {
-            var new_letter = rule.outcome.charAt((xd + 2) + ((yd + 2) * 5));
-            if(new_letter == '*') {
-                continue;
-            }
-            if(new_letter == 'O') {
-                new_letter = dwarf.letter;
-            }
-            var grid_x = wrap(dwarf.x + xd, w);
-            var grid_y = wrap(dwarf.y + yd, h);
+    //each rule has a list of outcomes to apply
+    for (var i = 0; i < rule.outcome.length; ++i) {
+        var new_cell = rule.outcome[i];
+        var grid_x = wrap(dwarf.x + new_cell.x, w);
+        var grid_y = wrap(dwarf.y + new_cell.y, h);
+        var new_letter = new_cell.val;
 
-            new_template[grid_x][grid_y] = priority(new_letter, new_template[grid_x][grid_y]);
+        if (new_letter == 'O') {
+            new_letter = dwarf.letter;
         }
+
+        new_template[grid_x][grid_y] = priority(new_letter, new_template[grid_x][grid_y]);
     }
 }
 
