@@ -302,6 +302,7 @@ function setUpDefaultWorld() {
         current_world[i][h-1] = id['S'];
     }
     current_world[90][h-2] = id['G'];
+    drawWorld();
 }
 
 //init
