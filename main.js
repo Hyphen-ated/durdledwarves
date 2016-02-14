@@ -325,8 +325,22 @@ function loadWorld() {
     drawWorld();
 }
 
+function clearWorld() {
+    if (!paused) {
+        return;
+    }
+    for(var x = 0; x < w; ++x) {
+        for (var y = 0; y < h; ++y) {
+            current_world[x][y] = id['_'];
+        }
+    }
+    drawWorld();
+}
 
 function setUpDefaultWorld() {
+    if (!paused) {
+        return;
+    }
     var world_from_hash = getHashValue("world");
     if (world_from_hash != null) {
         textzone.value = world_from_hash;
