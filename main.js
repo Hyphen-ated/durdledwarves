@@ -50,6 +50,16 @@ function cellMatchesRule(cell_contents, rule_contents) {
     if (cell_contents == 'G') {
         cell_contents = 'D';
     }
+    if(rule_contents == 's' && cell_contents != 'S') {
+        return true;
+    }
+    if(rule_contents == 'd' && cell_contents != 'G' && cell_contents != 'D') {
+        return true;
+    }
+    if(rule_contents == 'X' && cell_contents != '_') {
+        return true;
+    }
+
     return rule_contents == cell_contents;
 }
 

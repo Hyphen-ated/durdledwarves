@@ -124,7 +124,7 @@ var rule_definitions = [
     pattern:"*****"+
             "*****"+
             "*_O**"+
-            "*_S**"+
+            "*sS**"+
             "*****",
 
     outcome:"*****"+
