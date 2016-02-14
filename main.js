@@ -6,8 +6,8 @@ function wrap(a, size) {
 }
 
 //some nice little global state
-var w = 150;
-var h = 150;
+var w = 180;
+var h = 180;
 var cell_size = 5;
 var paused = true;
 
@@ -26,6 +26,8 @@ for(var x = 0; x < w; ++x) {
 }
 
 var canvas = document.getElementById('canvas');
+canvas.width = w * cell_size;
+canvas.height = h * cell_size;
 var slider = document.getElementById('slider');
 var ctx = canvas.getContext('2d');
 
@@ -247,7 +249,7 @@ function setUpDefaultWorld() {
     for(var i =0; i < w; ++i) {
         current_world[i][h-1] = 'S';
     }
-    current_world[75][h-2] = 'G';
+    current_world[90][h-2] = 'G';
 }
 
 //init
