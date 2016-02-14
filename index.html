@@ -6,7 +6,6 @@
 </head>
 <body>
 <p>This is Hyphen-ated's implementation of <a href="https://forums.goodgamery.com/viewtopic.php?f=8&t=6060">Durdle Dwarves, by paz.</a></p>
-<p>It's not working properly yet.</p>
 <canvas id="canvas" width="750" height="750">
     You need a browser with support for the canvas element to see this thing, and you aren't using one
 </canvas>
@@ -14,6 +13,7 @@
 <button type="button" id="pause" onclick="togglePause()">Pause/unpause</button>
 <button type="button" id="prev" onclick="previousState()">Prev</button>
 <button type="button" id="next" onclick="nextState()">Next</button>
+Frameskip: <input id="frameskip" type="number" value="0" onchange="updateFrameskip()">
 <br>
 <input type="range" class="slider-width" id="slider" min="0" max="0" oninput="sliderChange()"><br>
 

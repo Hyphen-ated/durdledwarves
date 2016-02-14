@@ -10,7 +10,7 @@ var w = 180;
 var h = 180;
 var cell_size = 5;
 var paused = true;
-
+var frameskip = 0;
 
 var current_world = new Array(w);
 for(var x = 0; x < w; ++x) {
@@ -169,6 +169,7 @@ var hist = {
     curr_gen_number: 0
 }
 
+var time_since_render = 9999;
 function update() {
     dwarves = [];
     for (var x = 0; x < w; ++x) {
@@ -180,7 +181,12 @@ function update() {
         }
     }
     current_world = makeNewWorld(dwarves, current_world, template_buffer);
-    drawWorld();
+    if (time_since_render > frameskip) {
+        drawWorld();
+        time_since_render = 1;
+    } else {
+        ++time_since_render;
+    }
 
     hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
     hist.buffer[hist.curr_idx] = current_world;
@@ -226,6 +232,8 @@ function nextState() {
     }
     //if we have no more precomputed history to advance, then compute a new state
     if(hist.curr_idx == hist.latest_idx) {
+        //force it to be rendered
+        time_since_render = 9999;
         update();
         return;
     }
@@ -239,6 +247,10 @@ function sliderChange() {
     hist.curr_idx = wrap(hist.earliest_idx + parseInt(slider.value), hist.size);
     current_world = hist.buffer[hist.curr_idx];
     drawWorld();
+}
+
+function updateFrameskip() {
+    frameskip = parseInt(document.getElementById('frameskip').value);
 }
 
 function setUpDefaultWorld() {
