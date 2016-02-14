@@ -200,8 +200,8 @@ function drawWorld() {
 
 // manually handle a circular buffer for history
 var hist = {
-    size: 100,
-    buffer: new Array(100),
+    size: 1000,
+    buffer: new Array(1000),
     curr_idx: 0, //the index into buffer where current_state goes
     earliest_idx: 0, // chronologically earliest of the states in buffer
     latest_idx: 0, // chronologically latest of the states in buffer
@@ -209,8 +209,12 @@ var hist = {
     curr_gen_number: 0
 }
 
+//initialize all the world buffers to be 2d arrays, w x h in size
 for(var i = 0; i < hist.size; ++i) {
-    hist.buffer[i] = $.extend(true, [], current_world);
+    hist.buffer[i] = new Array(w);
+    for (var j = 0; j < w; ++j) {
+        hist.buffer[i][j] = new Array(h);
+    }
 }
 
 var time_since_render = 9999;
