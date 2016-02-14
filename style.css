@@ -2,3 +2,70 @@
 {
     width: 900px;
 }
+
+#header
+{
+    text-align:center;
+    font-size:24px
+}
+
+#rulesheader
+{
+    text-align:center;
+    font-size:24px
+}
+
+#main
+{
+    width: 1000px;
+    background-color: #EEEEEE;
+    float: left;
+}
+
+#rules
+{
+    float: left;
+    width: 250px;
+    background-color: #E8F9FF;
+}
+
+#rules-scroller
+{
+    overflow: auto;
+    height: 1100px;
+    width: 90%;
+    background-color: #E8FFF9;
+    margin: 0 auto;
+}
+
+#apply-rule-changes
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.rule-square
+{
+    text-align: center;
+    border-radius: 10px;
+    background-color: #D0EDE0;
+    padding: 10px;
+    margin: 10px;
+    height: 350px;
+
+}
+
+.rule-textarea
+{
+    font-size: 24px;
+    resize: none;
+    overflow:hidden;
+}
+
+.rule-type-label
+{
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+}

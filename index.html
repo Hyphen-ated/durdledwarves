@@ -5,33 +5,44 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-<p>This is Hyphen-ated's implementation of <a href="https://forums.goodgamery.com/viewtopic.php?f=8&t=6060">Durdle Dwarves, by paz.</a></p>
-<canvas id="canvas" width="750" height="750">
-    You need a browser with support for the canvas element to see this thing, and you aren't using one
-</canvas>
-<br>
-<button type="button" id="pause" onclick="togglePause()">Pause/unpause</button>
-<button type="button" id="prev" onclick="previousState()">Prev</button>
-<button type="button" id="next" onclick="nextState()">Next</button>
-Frameskip: <input id="frameskip" type="number" value="0" onchange="updateFrameskip()">
-Frame delay (ms): <input id="framedelay" type="number" value="0" onchange="updateFrameDelay()">
-<button type="button" id="restart" onclick="setUpDefaultWorld()">Restart</button>
-<button type="button" id="clear" onclick="clearWorld()">Clear</button>
-<br>
-<input type="range" class="slider-width" id="slider" min="0" max="0" oninput="sliderChange()"><br>
+<div id="main">
+    <p id="header">Automatic Dwarves</p>
+    <canvas id="canvas" width="750" height="750">
+        You need a browser with support for the canvas element to see this thing, and you aren't using one
+    </canvas>
+    <br>
+    <button type="button" id="pause" onclick="togglePause()">Pause/unpause</button>
+    <button type="button" id="prev" onclick="previousState()">Prev</button>
+    <button type="button" id="next" onclick="nextState()">Next</button>
+    Frameskip: <input id="frameskip" type="number" value="0" onchange="updateFrameskip()">
+    Frame delay (ms): <input id="framedelay" type="number" value="0" onchange="updateFrameDelay()">
+    <button type="button" id="restart" onclick="setUpDefaultWorld()">Restart</button>
+    <button type="button" id="clear" onclick="clearWorld()">Clear</button>
+    <br>
+    <input type="range" class="slider-width" id="slider" min="0" max="0" oninput="sliderChange()"><br>
 
-clicking gives:<br>
-<input type="radio" name="clickAddition" id="dwarf" value="G" checked>
-<label for="dwarf">Dwarf</label><br>
-<input type="radio" name="clickAddition" id="stone" value="S">
-<label for="stone">Stone</label><br>
-<input type="radio" name="clickAddition" id="space" value="_">
-<label for="space">Empty space</label><br>
+    clicking gives:<br>
+    <input type="radio" name="clickAddition" id="dwarf" value="G" checked>
+    <label for="dwarf">Dwarf</label><br>
+    <input type="radio" name="clickAddition" id="stone" value="S">
+    <label for="stone">Stone</label><br>
+    <input type="radio" name="clickAddition" id="space" value="_">
+    <label for="space">Empty space</label><br>
 
-<button type="button" id="dumpworld" onclick="dumpWorld()">Dump World State</button>
-<button type="button" id="loadworld" onclick="loadWorld()">Load World State</button><br>
+    <button type="button" id="dumpworld" onclick="dumpWorld()">Dump World State</button>
+    <button type="button" id="loadworld" onclick="loadWorld()">Load World State</button><br>
 
-<textarea id="textzone" rows="6" cols="80"></textarea>
+    <textarea id="textzone" rows="6" cols="80"></textarea><br>
+    <p>This is Hyphen-ated's implementation of <a href="https://forums.goodgamery.com/viewtopic.php?f=8&t=6060">Durdle Dwarves, by paz.</a></p>
+
+</div>
+
+<div id="rules">
+    <p id="rulesheader">Rules</p>
+    <button type="button" id="apply-rule-changes" onclick="applyRuleChanges()">Apply Changes</button>
+    <div id="rules-scroller">
+    </div>
+</div>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
