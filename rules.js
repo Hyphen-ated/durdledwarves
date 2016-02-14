@@ -104,6 +104,21 @@ var rule_definitions = [
             "*****"+
             "*****"
 },
+{
+    name: "Scale down",
+
+    pattern:"*****"+
+            "*_S_*"+
+            "*_O_*"+
+            "*_S_*"+
+            "*****",
+
+    outcome:"*****"+
+            "*****"+
+            "**_**"+
+            "*O***"+
+            "*****"
+},
 //{
 //    name: "Left-going curl-downs",
 //    pattern:"*****"+
@@ -136,33 +151,48 @@ var rule_definitions = [
 {
     name: "Plummet",
 
-    pattern:"**__*"+
-            "**S_*"+
-            "*_O_*"+
-            "*___*"+
-            "*****",
+    pattern:"****_"+
+            "*SSS_"+
+            "*_OS_"+
+            "*____"+
+            "*____",
 
     outcome:"*****"+
-            "***S*"+
-            "**_**"+
-            "**O**"+
-            "*****"
-},
-{
-    name: "Debridge",
-
-    pattern:"*___*"+
-            "*SSS*"+
-            "*_O_*"+
-            "*___*"+
-            "*****",
-
-    outcome:"*****"+
-            "*_***"+
-            "**_O*"+
             "*****"+
-            "*****"
+            "**_**"+
+            "*****"+
+            "**O**"
 },
+//{
+//    name: "Plummet",
+//
+//    pattern:"**__*"+
+//            "**S_*"+
+//            "*_O_*"+
+//            "*___*"+
+//            "*****",
+//
+//    outcome:"*****"+
+//            "***S*"+
+//            "**_**"+
+//            "**O**"+
+//            "*****"
+//},
+//{
+//    name: "Debridge",
+//
+//    pattern:"*___*"+
+//            "*SSS*"+
+//            "*_O_*"+
+//            "*___*"+
+//            "*****",
+//
+//    outcome:"*****"+
+//            "*_***"+
+//            "**_O*"+
+//            "*****"+
+//            "*****"
+//},
 {
     name: "No-roof cave down",
 
@@ -316,20 +346,3 @@ var rule_definitions = [
 
 ]
 
-//preprocess rule definitions so we have a list of which squares we care about
-var rules = [];
-
-for (var i = 0; i < rule_definitions.length; ++i) {
-    var defn = rule_definitions[i];
-    var new_pattern = [];
-    var new_outcome = [];
-    for (var s = 0; s < 25; ++s) {
-        if(defn.pattern[s] != "*" && defn.pattern[s] != "O") {
-            new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.pattern[s]});
-        }
-        if(defn.outcome[s] != "*") {
-            new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.outcome[s]});
-        }
-    }
-    rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
-}

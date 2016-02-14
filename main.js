@@ -163,8 +163,10 @@ var hist = {
     buffer: new Array(500),
     curr_idx: 0, //the index into buffer where current_state goes
     earliest_idx: 0, // chronologically earliest of the states in buffer
-    latest_idx: 0 // chronologically latest of the states in buffer
+    latest_idx: 0, // chronologically latest of the states in buffer
     //the current state can be different from the latest state if we're doing rewinding
+
+    curr_gen_number: 0
 }
 
 function update() {
@@ -253,6 +255,26 @@ function setUpDefaultWorld() {
 }
 
 //init
+
+//preprocess rule definitions so we have a list of which squares we care about in rules
+var rules = [];
+
+for (var i = 0; i < rule_definitions.length; ++i) {
+    var defn = rule_definitions[i];
+    var new_pattern = [];
+    var new_outcome = [];
+    for (var s = 0; s < 25; ++s) {
+        if(defn.pattern[s] != "*" && defn.pattern[s] != "O") {
+            new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.pattern[s]});
+        }
+        if(defn.outcome[s] != "*") {
+            new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.outcome[s]});
+        }
+    }
+    rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
+}
+
+
 setUpDefaultWorld();
 hist.buffer[0] = current_world;
 drawWorld();
