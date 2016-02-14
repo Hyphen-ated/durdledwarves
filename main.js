@@ -5,6 +5,18 @@ function wrap(a, size) {
     return (a + size) % size;
 }
 
+
+var id = {
+    "_": 1, //blank space
+    "S": 2, //stone
+    "D": 3, //dwarf
+    "G": 4, //green dwarf (initially present or manually placed)
+    "*": 5, // for rules: anything
+    "X": 6, // for rules: not blank space
+    "s": 7, // for rules: not stone
+    "d": 8,  // for rules: not dwarf
+    "O": 9 //for rules: the acting dwarf
+}
 //some nice little global state
 var w = 180;
 var h = 180;
@@ -16,7 +28,7 @@ var current_world = new Array(w);
 for(var x = 0; x < w; ++x) {
     current_world[x] = new Array(h);
     for (var y = 0; y < h; ++y) {
-        current_world[x][y] = '_';
+        current_world[x][y] = id['_'];
     }
 }
 var template_buffer = new Array(w);
@@ -49,16 +61,16 @@ canvas.addEventListener('click', clicked, false);
 
 function cellMatchesRule(cell_contents, rule_contents) {
     // green dwarves count as regular dwarves
-    if (cell_contents == 'G') {
-        cell_contents = 'D';
+    if (cell_contents == id['G']) {
+        cell_contents = id['D'];
     }
-    if(rule_contents == 's' && cell_contents != 'S') {
+    if(rule_contents == id['s'] && cell_contents != id['S']) {
         return true;
     }
-    if(rule_contents == 'd' && cell_contents != 'G' && cell_contents != 'D') {
+    if(rule_contents == id['d'] && cell_contents != id['G'] && cell_contents != id['D']) {
         return true;
     }
-    if(rule_contents == 'X' && cell_contents != '_') {
+    if(rule_contents == id['X'] && cell_contents != id['_']) {
         return true;
     }
 
@@ -80,10 +92,10 @@ function ruleTriggered(rule, dwarf, old_world) {
 }
 
 function priority(a, b) {
-    if (a == 'G' || b == 'G') return 'G';
-    if (a == 'D' || b == 'D') return 'D';
-    if (a == 'S' || b == 'S') return 'S';
-    return '_';
+    if (a == id['G'] || b == id['G']) return id['G'];
+    if (a == id['D'] || b == id['D']) return id['D'];
+    if (a == id['S'] || b == id['S']) return id['S'];
+    return id['_'];
 }
 
 function applyOutcome(rule, dwarf, new_template) {
@@ -94,7 +106,7 @@ function applyOutcome(rule, dwarf, new_template) {
         var grid_y = wrap(dwarf.y + new_cell.y, h);
         var new_letter = new_cell.val;
 
-        if (new_letter == 'O') {
+        if (new_letter == id['O']) {
             new_letter = dwarf.letter;
         }
 
@@ -136,12 +148,13 @@ function makeNewWorld(dwarves, old_world, new_template) {
     return new_world;
 }
 
-var colorsByLetter = {
-    "G": "#00FF99",
-    "D": "#FF9900",
-    "_": "#050505",
-    "S": "#999999"
-}
+var colorsByLetter = {};
+
+colorsByLetter[id["G"]] = "#00FF99";
+colorsByLetter[id["D"]] = "#FF9900";
+colorsByLetter[id["_"]] = "#050505";
+colorsByLetter[id["S"]] = "#999999";
+
 
 function drawCell(x, y, letter) {
     ctx.fillStyle = colorsByLetter[letter];
@@ -175,7 +188,7 @@ function update() {
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             var letter = current_world[x][y];
-            if (letter == "G" || letter == "D") {
+            if (letter == id["G"] || letter == id["D"]) {
                 dwarves.push({"x": x, "y": y, "letter": letter});
             }
         }
@@ -256,14 +269,14 @@ function updateFrameskip() {
 function setUpDefaultWorld() {
     for(var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
-            current_world[x][y] = '_';
+            current_world[x][y] = id['_'];
         }
     }
 
     for(var i =0; i < w; ++i) {
-        current_world[i][h-1] = 'S';
+        current_world[i][h-1] = id['S'];
     }
-    current_world[90][h-2] = 'G';
+    current_world[90][h-2] = id['G'];
 }
 
 //init
@@ -277,10 +290,10 @@ function preprocessRules(rule_definitions) {
         var new_outcome = [];
         for (var s = 0; s < 25; ++s) {
             if(defn.pattern[s] != "*" && defn.pattern[s] != "O") {
-                new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.pattern[s]});
+                new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:id[defn.pattern[s]]});
             }
             if(defn.outcome[s] != "*") {
-                new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.outcome[s]});
+                new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:id[defn.outcome[s]]});
             }
         }
         new_rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
