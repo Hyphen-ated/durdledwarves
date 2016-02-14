@@ -1,4 +1,4 @@
-var rule_definitions = [
+var original_definitions = [
 {
     name: "Spawn on platform",
 

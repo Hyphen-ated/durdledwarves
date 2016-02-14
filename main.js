@@ -268,25 +268,27 @@ function setUpDefaultWorld() {
 
 //init
 
-//preprocess rule definitions so we have a list of which squares we care about in rules
-var rules = [];
-
-for (var i = 0; i < rule_definitions.length; ++i) {
-    var defn = rule_definitions[i];
-    var new_pattern = [];
-    var new_outcome = [];
-    for (var s = 0; s < 25; ++s) {
-        if(defn.pattern[s] != "*" && defn.pattern[s] != "O") {
-            new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.pattern[s]});
+//turn the rules into a list of which squares we care about and a list of which squares get changed
+function preprocessRules(rule_definitions) {
+    var new_rules = [];
+    for (var i = 0; i < rule_definitions.length; ++i) {
+        var defn = rule_definitions[i];
+        var new_pattern = [];
+        var new_outcome = [];
+        for (var s = 0; s < 25; ++s) {
+            if(defn.pattern[s] != "*" && defn.pattern[s] != "O") {
+                new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.pattern[s]});
+            }
+            if(defn.outcome[s] != "*") {
+                new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.outcome[s]});
+            }
         }
-        if(defn.outcome[s] != "*") {
-            new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:defn.outcome[s]});
-        }
+        new_rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
     }
-    rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
+    return new_rules;
 }
 
-
+var rules = preprocessRules(original_definitions);
 setUpDefaultWorld();
 hist.buffer[0] = current_world;
 drawWorld();
