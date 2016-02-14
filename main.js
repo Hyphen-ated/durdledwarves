@@ -327,6 +327,13 @@ function loadWorld() {
 
 
 function setUpDefaultWorld() {
+    var world_from_hash = getHashValue("world");
+    if (world_from_hash != null) {
+        textzone.value = world_from_hash;
+        loadWorld();
+        return;
+    }
+
     for(var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             current_world[x][y] = id['_'];
