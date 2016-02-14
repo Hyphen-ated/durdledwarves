@@ -430,6 +430,11 @@ function populatePageWithRules(rule_definitions) {
     }
 }
 
+$(function() {
+    $( "#rules-scroller" ).sortable();
+    $( "#rules-scroller" ).disableSelection();
+  });
+
 var rules = preprocessRules(original_definitions);
 
 populatePageWithRules(original_definitions);
