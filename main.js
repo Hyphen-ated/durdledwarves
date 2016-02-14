@@ -59,22 +59,36 @@ function clicked(event) {
 }
 canvas.addEventListener('click', clicked, false);
 
-function cellMatchesRule(cell_contents, rule_contents) {
-    // green dwarves count as regular dwarves
-    if (cell_contents == id['G']) {
-        cell_contents = id['D'];
-    }
-    if(rule_contents == id['s'] && cell_contents != id['S']) {
-        return true;
-    }
-    if(rule_contents == id['d'] && cell_contents != id['G'] && cell_contents != id['D']) {
-        return true;
-    }
-    if(rule_contents == id['X'] && cell_contents != id['_']) {
-        return true;
-    }
+cell_matching_table = {};
+//cell_matching_table[cell_contents][rule_contents]
+cell_matching_table[id['G']] = {}
+cell_matching_table[id['G']][id["_"]] = false,
+cell_matching_table[id['G']][id["S"]] = false,
+cell_matching_table[id['G']][id["D"]] = true,
+cell_matching_table[id['G']][id["X"]] = true,
+cell_matching_table[id['G']][id["s"]] = true,
+cell_matching_table[id['G']][id["d"]] = false
 
-    return rule_contents == cell_contents;
+cell_matching_table[id['D']] = cell_matching_table[id['G']];
+
+cell_matching_table[id['S']] = {}
+cell_matching_table[id['S']][id["_"]] = false,
+cell_matching_table[id['S']][id["S"]] = true,
+cell_matching_table[id['S']][id["D"]] = false,
+cell_matching_table[id['S']][id["X"]] = true,
+cell_matching_table[id['S']][id["s"]] = false,
+cell_matching_table[id['S']][id["d"]] = true
+
+cell_matching_table[id['_']] = {}
+cell_matching_table[id['_']][id["_"]] = true,
+cell_matching_table[id['_']][id["S"]] = false,
+cell_matching_table[id['_']][id["D"]] = false,
+cell_matching_table[id['_']][id["X"]] = false,
+cell_matching_table[id['_']][id["s"]] = true,
+cell_matching_table[id['_']][id["d"]] = true
+
+function cellMatchesRule(cell_contents, rule_contents) {
+    return cell_matching_table[cell_contents][rule_contents]
 }
 
 function ruleTriggered(rule, dwarf, old_world) {
