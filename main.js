@@ -306,6 +306,25 @@ function updateFrameDelay() {
     frame_delay = parseInt(document.getElementById('framedelay').value);
 }
 
+function dumpWorld() {
+    var textzone = document.getElementById("textzone");
+    var world_json = JSON.stringify(current_world);
+    var compressed = LZString.compressToBase64(world_json);
+    textzone.value = compressed;
+}
+
+function loadWorld() {
+    if(!paused) {
+        return;
+    }
+    var textzone = document.getElementById("textzone");
+    var compressed = textzone.value;
+    var world_json = LZString.decompressFromBase64(compressed);
+    current_world = JSON.parse(world_json);
+    hist.latest_idx = hist.curr_idx;
+    drawWorld();
+}
+
 
 function setUpDefaultWorld() {
     for(var x = 0; x < w; ++x) {
@@ -320,8 +339,6 @@ function setUpDefaultWorld() {
     current_world[90][h-2] = id['G'];
     drawWorld();
 }
-
-//init
 
 //turn the rules into a list of which squares we care about and a list of which squares get changed
 function preprocessRules(rule_definitions) {
