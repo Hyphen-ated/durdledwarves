@@ -51,13 +51,23 @@ function clicked(event) {
     var pos = canvas.relMouseCoords(event);
     var x = Math.floor(pos.x / cell_size);
     var y = Math.floor(pos.y / cell_size);
-    var letter = $('input[name=clickAddition]:checked').val();
-    current_world[x][y] = letter;
-    drawCell(x, y, letter);
+    var val = $('input[name=clickAddition]:checked').val();
+    var val_id = id[val];
+    current_world[x][y] = val_id;
+    drawCell(x, y, val_id);
 
     hist.latest_idx = hist.curr_idx;
 }
 canvas.addEventListener('click', clicked, false);
+canvas.onmousedown = function(event) { event.preventDefault();};
+
+//when they move the mouse, if they're holding click, then draw like they clicked
+function mouseMove(event) {
+    if (event.which == 1) {
+        clicked(event);
+    }
+}
+canvas.onmousemove = mouseMove;
 
 cell_matching_table = {};
 //cell_matching_table[cell_contents][rule_contents]
