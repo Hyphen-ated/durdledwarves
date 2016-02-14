@@ -23,6 +23,7 @@ var h = 180;
 var cell_size = 5;
 var paused = true;
 var frameskip = 0;
+var frame_delay = 0;
 
 var current_world = new Array(w);
 for(var x = 0; x < w; ++x) {
@@ -248,7 +249,7 @@ function update() {
     slider.value = slider.max;
 
     if(!paused) {
-        setTimeout(update, 0)
+        setTimeout(update, frame_delay)
     }
 }
 
@@ -300,6 +301,11 @@ function sliderChange() {
 function updateFrameskip() {
     frameskip = parseInt(document.getElementById('frameskip').value);
 }
+
+function updateFrameDelay() {
+    frame_delay = parseInt(document.getElementById('framedelay').value);
+}
+
 
 function setUpDefaultWorld() {
     for(var x = 0; x < w; ++x) {
