@@ -311,10 +311,13 @@ function updateFrameDelay() {
 }
 
 function dumpWorld() {
+    textzone.value = getCompressedWorldText();
+}
+
+function getCompressedWorldText() {
     var textzone = document.getElementById("textzone");
     var world_json = JSON.stringify(current_world);
-    var compressed = LZString.compressToBase64(world_json);
-    textzone.value = compressed;
+    return LZString.compressToBase64(world_json);
 }
 
 function loadWorld() {
@@ -329,6 +332,22 @@ function loadWorld() {
     drawWorld();
 }
 
+function makeLinkToWorldAndRules() {
+    var baseurl = window.location.href.split('#')[0];
+    var link = baseurl + "#world=" + getCompressedWorldText();
+    if (rule_definitions !== original_definitions) {
+        link = link + ",rules=" + getCompressedRuleText();
+    }
+    return link;
+}
+
+function doShareLink() {
+    var sharezone = document.getElementById("sharezone");
+    sharezone.value = makeLinkToWorldAndRules();
+    sharezone.select();
+
+}
+
 function clearWorld() {
     if (!paused) {
         return;
@@ -341,7 +360,7 @@ function clearWorld() {
     drawWorld();
 }
 
-function setUpDefaultWorld() {
+function setUpInitialWorld() {
     if (!paused) {
         return;
     }
@@ -365,12 +384,31 @@ function setUpDefaultWorld() {
     drawWorld();
 }
 
+function setUpInitialRules() {
+    if (!paused) {
+        return;
+    }
+    var compressed_rules = getHashValue("rules");
+    if (compressed_rules != null) {
+        decompressedRules =  LZString.decompressFromBase64(compressed_rules);
+        if ( decompressedRules != null) {
+            var rulezone = document.getElementById("rulezone");
+            rulezone.value = decompressedRules;
+            loadRules();
+            return;
+        }
+    }
+}
+
+
+
 var rules = preprocessRules(original_definitions);
 
 populatePageWithRules(original_definitions);
-$( "#rules-scroller" ).sortable();
-$( "#rules-scroller" ).disableSelection();
+$( "#rules-container" ).sortable();
+$( "#rules-container" ).disableSelection();
 
-setUpDefaultWorld();
+setUpInitialWorld();
+setUpInitialRules();
 hist.buffer[0] = current_world;
 drawWorld();

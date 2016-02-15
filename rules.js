@@ -405,7 +405,7 @@ function preprocessRules(rule_definitions) {
 
 
 function populatePageWithRules(rule_definitions) {
-    var rule_container = document.getElementById("rules-scroller");
+    var rule_container = document.getElementById("rules-container");
     rule_container.innerHTML = ""
 
 
@@ -454,7 +454,7 @@ function applyRuleChanges() {
     if (!paused) {
         return;
     }
-    var rule_container = document.getElementById("rules-scroller");
+    var rule_container = document.getElementById("rules-container");
     var rule_divs = rule_container.getElementsByTagName("div");
     var new_definitions = [];
     for (var i = 0; i < rule_divs.length; ++i) {
@@ -471,6 +471,7 @@ function applyRuleChanges() {
     if (new_rules != null) {
         rules = new_rules;
         rule_definitions = new_definitions;
+        hist.latest_idx = hist.curr_idx;
         setRuleErrorMsg("");
     }
 }
@@ -483,6 +484,11 @@ function dumpRules() {
     var rulezone = document.getElementById("rulezone");
     var rule_json = JSON.stringify(rule_definitions);
     rulezone.value = rule_json;
+}
+
+function getCompressedRuleText() {
+    var rule_json = JSON.stringify(rule_definitions);
+    return LZString.compressToBase64(rule_json);
 }
 
 function loadRules() {
