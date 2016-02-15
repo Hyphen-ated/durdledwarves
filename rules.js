@@ -449,9 +449,19 @@ function populatePageWithRules(rule_definitions) {
         rule_container.appendChild(rule_div);
     }
 
-    $("#ruleset-name")[0].value = rule_definitions.ruleset_name;
+    var ruleset_name = document.getElementById("ruleset-name");
+    ruleset_name.value = rule_definitions.ruleset_name;
+    var x=0;
 }
 
+
+function applyRuleChangesButton() {
+    var ruleset_name_display = document.getElementById("ruleset-name");
+    if (ruleset_name_display.value === original_definitions.ruleset_name) {
+        ruleset_name_display.value = "Custom rules";
+    }
+    applyRuleChanges();
+}
 
 function applyRuleChanges() {
     if (!paused) {
@@ -460,7 +470,7 @@ function applyRuleChanges() {
     var rule_container = document.getElementById("rules-container");
     var rule_divs = rule_container.getElementsByTagName("div");
     var ruleset_name = document.getElementById("ruleset-name").value;
-    var new_definitions = {name: ruleset_name, rules: []};
+    var new_definitions = {ruleset_name: ruleset_name, rules: []};
     for (var i = 0; i < rule_divs.length; ++i) {
         var rule_div = rule_divs[i];
         var new_definition = {};
@@ -477,10 +487,7 @@ function applyRuleChanges() {
         rule_definitions = new_definitions;
         hist.latest_idx = hist.curr_idx;
         setRuleErrorMsg("");
-        var ruleset_name_display = $("#ruleset-name")[0];
-        if (ruleset_name_display.value === original_definitions.ruleset_name) {
-            ruleset_name_display.value = "Custom rules";
-        }
+
     }
 }
 
