@@ -346,6 +346,8 @@ var original_definitions = [
 
 ]
 
+var rule_definitions = original_definitions;
+
 //turn the rules into a list of which squares we care about and a list of which squares get changed
 function preprocessRules(rule_definitions) {
     var new_rules = [];
@@ -359,7 +361,7 @@ function preprocessRules(rule_definitions) {
             return null;
         }
         if (defn.pattern[12] != "O") {
-           setRuleErrorMsg("Rule '" + defn.name + "' must have an O in the middle of its pattern")
+           setRuleErrorMsg("Rule '" + defn.name + "' must have an 'O' in the middle of its pattern")
            return null;
         }
         var Ocount = (defn.pattern.match(/O/g) || []).length;
@@ -380,12 +382,12 @@ function preprocessRules(rule_definitions) {
 
         for (var s = 0; s < 25; ++s) {
             if (validPatternChars.indexOf(defn.pattern[s]) === -1) {
-                setRuleErrorMsg("Rule '" + defn.name + "' has the invalid character '" + defn.pattern[s] + " in its pattern. Allowed characters are: *, O, D, S, _, d, s, and X");
+                setRuleErrorMsg("Rule '" + defn.name + "' has the invalid character '" + defn.pattern[s] + "' in its pattern. Allowed characters are: *, O, D, S, _, d, s, and X");
                 return null;
             }
 
             if (validOutcomeChars.indexOf(defn.outcome[s]) === -1) {
-                setRuleErrorMsg("Rule '" + defn.name + "' has the invalid character '" + defn.outcome[s] + " in its outcome. Allowed characters are: *, O, D, S, and _");
+                setRuleErrorMsg("Rule '" + defn.name + "' has the invalid character '" + defn.outcome[s] + "' in its outcome. Allowed characters are: *, O, D, S, and _");
                 return null;
             }
 
@@ -412,10 +414,10 @@ function populatePageWithRules(rule_definitions) {
 
         var rule_div = document.createElement("div");
         rule_div.className = "rule-square";
-        var rule_title = document.createElement("input");
-        rule_title.className = "rule-title";
-        rule_title.value = rule_defn.name;
-        rule_div.appendChild(rule_title);
+        var rule_name = document.createElement("input");
+        rule_name.className = "rule-name";
+        rule_name.value = rule_defn.name;
+        rule_div.appendChild(rule_name);
 
         var pattern_label = document.createElement("p");
         pattern_label.className = "rule-type-label";
@@ -458,7 +460,7 @@ function applyRuleChanges() {
     for (var i = 0; i < rule_divs.length; ++i) {
         var rule_div = rule_divs[i];
         var new_definition = {};
-        new_definition.title = rule_div.getElementsByClassName("rule-title")[0].value;
+        new_definition.name = rule_div.getElementsByClassName("rule-name")[0].value;
         new_definition.pattern = rule_div.getElementsByClassName("pattern-textarea")[0].value;
 
         new_definition.outcome = rule_div.getElementsByClassName("outcome-textarea")[0].value;
@@ -468,10 +470,27 @@ function applyRuleChanges() {
     var new_rules = preprocessRules(new_definitions);
     if (new_rules != null) {
         rules = new_rules;
+        rule_definitions = new_definitions;
         setRuleErrorMsg("");
     }
 }
 
 function setRuleErrorMsg(msg) {
     $( "#rules-error" ).text(msg);
+}
+
+function dumpRules() {
+    var rulezone = document.getElementById("rulezone");
+    var rule_json = JSON.stringify(rule_definitions);
+    rulezone.value = rule_json;
+}
+
+function loadRules() {
+    if(!paused) {
+        return;
+    }
+    var rulezone = document.getElementById("rulezone");
+    var new_rule_definitions = JSON.parse(rulezone.value);
+    populatePageWithRules(new_rule_definitions);
+    applyRuleChanges();
 }
