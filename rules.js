@@ -400,7 +400,7 @@ function preprocessRules(rule_definitions) {
                 new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:id[defn.outcome[s]]});
             }
         }
-        new_rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
+        new_rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome, uses: 0});
     }
     return new_rules;
 }
@@ -439,6 +439,21 @@ function populatePageWithRules(rule_definitions) {
 
         rule_delete.innerHTML = "X";
         rule_div.appendChild(rule_delete);
+
+        var uses_div = document.createElement("div");
+        uses_div.className = "uses-div";
+
+        var uses_label = document.createElement("p");
+        uses_label.className = "uses-label";
+        uses_label.innerHTML = "uses:";
+        uses_div.appendChild(uses_label);
+
+        var uses_counter = document.createElement("p");
+        uses_counter.className = "uses-counter";
+        uses_counter.id = "uses-counter"+i;
+        uses_counter.innerHTML = "0";
+        uses_div.appendChild(uses_counter);
+        rule_div.appendChild(uses_div);
 
         var pattern_label = document.createElement("p");
         pattern_label.className = "rule-type-label";

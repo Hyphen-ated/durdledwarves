@@ -88,3 +88,16 @@
     top: 40px;
     right: 15px;
 }
+
+.uses-div
+{
+    position: absolute;
+    top: 55px;
+    left: 5px;
+}
+
+.uses-counter
+{
+    margin: 0;
+    padding: 0;
+}

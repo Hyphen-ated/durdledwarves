@@ -24,6 +24,7 @@ var cell_size = 5;
 var paused = true;
 var frameskip = 0;
 var frame_delay = 0;
+var showUses = true;
 
 var current_world = new Array(w);
 for(var x = 0; x < w; ++x) {
@@ -137,6 +138,7 @@ function applyOutcome(rule, dwarf, new_template) {
 
         new_template[grid_x][grid_y] = priority(new_letter, new_template[grid_x][grid_y]);
     }
+    rule.uses++;
 }
 
 function advanceDwarf(dwarf, old_world, new_template) {
@@ -194,6 +196,13 @@ function drawWorld() {
         for (var y = 0; y < h; ++y) {
             var letter = current_world[x][y];
             drawCell(x, y, letter);
+        }
+    }
+
+    if (showUses) {
+        for (var i = 0; i < rules.length; ++i ) {
+            var rule = rules[i];
+            document.getElementById("uses-counter" + i).innerHTML = rule.uses;
         }
     }
 }
