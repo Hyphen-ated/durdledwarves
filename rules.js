@@ -405,6 +405,10 @@ function preprocessRules(rule_definitions) {
     return new_rules;
 }
 
+function deleteRule(rule_id) {
+    var element = document.getElementById(rule_id);
+    element.parentNode.removeChild(element);
+}
 
 function populatePageWithRules(rule_definitions) {
     var rule_container = document.getElementById("rules-container");
@@ -415,10 +419,26 @@ function populatePageWithRules(rule_definitions) {
 
         var rule_div = document.createElement("div");
         rule_div.className = "rule-square";
+        var this_id = "rule_div" + i;
+        rule_div.setAttribute("id", this_id);
+
         var rule_name = document.createElement("input");
         rule_name.className = "rule-name";
         rule_name.value = rule_defn.name;
         rule_div.appendChild(rule_name);
+
+        var rule_delete = document.createElement("button");
+        rule_delete.className = "rule-delete";
+        //this abomination is a generator function because js has horrible scoping rules.
+        // see: http://stackoverflow.com/questions/1451009/javascript-infamous-loop-issue
+        rule_delete.onclick = function(some_id) {
+            return function() {
+                deleteRule(some_id);
+            }
+        }(this_id);
+
+        rule_delete.innerHTML = "X";
+        rule_div.appendChild(rule_delete);
 
         var pattern_label = document.createElement("p");
         pattern_label.className = "rule-type-label";
