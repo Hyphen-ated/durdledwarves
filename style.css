@@ -45,6 +45,11 @@
     margin-right: auto;
 }
 
+#rules-error
+{
+    color: red;
+}
+
 .rule-square
 {
     text-align: center;

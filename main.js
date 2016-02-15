@@ -365,79 +365,11 @@ function setUpDefaultWorld() {
     drawWorld();
 }
 
-//turn the rules into a list of which squares we care about and a list of which squares get changed
-function preprocessRules(rule_definitions) {
-    var new_rules = [];
-    for (var i = 0; i < rule_definitions.length; ++i) {
-        var defn = rule_definitions[i];
-        var new_pattern = [];
-        var new_outcome = [];
-        for (var s = 0; s < 25; ++s) {
-            if(defn.pattern[s] != "*" && defn.pattern[s] != "O") {
-                new_pattern.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:id[defn.pattern[s]]});
-            }
-            if(defn.outcome[s] != "*") {
-                new_outcome.push({x: s % 5 - 2, y:Math.floor(s / 5) - 2, val:id[defn.outcome[s]]});
-            }
-        }
-        new_rules.push({name: defn.name, pattern: new_pattern, outcome: new_outcome});
-    }
-    return new_rules;
-}
-
-function populatePageWithRules(rule_definitions) {
-    var rule_container = document.getElementById("rules-scroller");
-    rule_container.innerHTML = ""
-
-
-    for(var i = 0; i < rule_definitions.length; ++i) {
-        var rule_defn = rule_definitions[i];
-
-        var rule_div = document.createElement("div");
-        rule_div.className = "rule-square";
-        var rule_title = document.createElement("input");
-        rule_title.className = "rule-title";
-        rule_title.value = rule_defn.name;
-        rule_div.appendChild(rule_title);
-
-        var pattern_label = document.createElement("p");
-        pattern_label.className = "rule-type-label";
-        pattern_label.innerHTML = "Pattern:";
-        rule_div.appendChild(pattern_label);
-
-        var pattern_textarea = document.createElement("textarea");
-        pattern_textarea.className = "rule-textarea";
-        pattern_textarea.name = "pattern";
-        pattern_textarea.rows = "5";
-        pattern_textarea.cols = "4";
-        pattern_textarea.innerHTML = rule_defn.pattern;
-        rule_div.appendChild(pattern_textarea);
-
-        var outcome_label = document.createElement("p");
-        outcome_label.className = "rule-type-label";
-        outcome_label.innerHTML = "Outcome:";
-        rule_div.appendChild(outcome_label);
-
-        var outcome_textarea = document.createElement("textarea");
-        outcome_textarea.className = "rule-textarea";
-        outcome_textarea.name = "outcome";
-        outcome_textarea.rows = "5";
-        outcome_textarea.cols = "4";
-        outcome_textarea.innerHTML = rule_defn.outcome;
-        rule_div.appendChild(outcome_textarea);
-                     
-        rule_container.appendChild(rule_div);
-    }
-}
-
-$(function() {
-    $( "#rules-scroller" ).sortable();
-    $( "#rules-scroller" ).disableSelection();
-  });
-
 var rules = preprocessRules(original_definitions);
 
 populatePageWithRules(original_definitions);
+$( "#rules-scroller" ).sortable();
+$( "#rules-scroller" ).disableSelection();
 
 setUpDefaultWorld();
 hist.buffer[0] = current_world;
