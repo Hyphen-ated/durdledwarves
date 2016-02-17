@@ -503,7 +503,7 @@ function applyRuleChanges() {
         return;
     }
     var rule_container = document.getElementById("rules-container");
-    var rule_divs = rule_container.getElementsByTagName("div");
+    var rule_divs = rule_container.getElementsByClassName("rule-square");
     var ruleset_name = document.getElementById("ruleset-name").value;
     var new_definitions = {ruleset_name: ruleset_name, rules: []};
     for (var i = 0; i < rule_divs.length; ++i) {
@@ -522,7 +522,18 @@ function applyRuleChanges() {
         rule_definitions = new_definitions;
         hist.latest_idx = hist.curr_idx;
         setRuleErrorMsg("");
+        renumberRules();
+    }
+}
 
+function renumberRules() {
+    var rule_container = document.getElementById("rules-container");
+    var rule_divs = rule_container.getElementsByTagName("div");
+    for (var i = 0; i < rule_divs.length; ++i) {
+        var rule_div = rule_divs[i];
+        var uses_div = rule_div.getElementsByClassName("uses-div")[0];
+        var uses_counter = uses_div.getElementsByClassName("uses-counter")[0];
+        uses_counter.id = "uses_counter" + i;
     }
 }
 

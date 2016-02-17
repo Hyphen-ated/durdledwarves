@@ -202,7 +202,10 @@ function drawWorld() {
     if (showUses) {
         for (var i = 0; i < rules.length; ++i ) {
             var rule = rules[i];
-            document.getElementById("uses-counter" + i).innerHTML = rule.uses;
+            var uses_counter = document.getElementById("uses-counter" + i);
+            if(uses_counter) {
+                uses_counter.innerHTML = rule.uses;
+            }
         }
     }
 }
