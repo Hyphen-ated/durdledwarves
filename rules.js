@@ -528,7 +528,7 @@ function applyRuleChanges() {
 
 function renumberRules() {
     var rule_container = document.getElementById("rules-container");
-    var rule_divs = rule_container.getElementsByTagName("div");
+    var rule_divs = rule_container.getElementsByTagClassname("rule-square");
     for (var i = 0; i < rule_divs.length; ++i) {
         var rule_div = rule_divs[i];
         var uses_div = rule_div.getElementsByClassName("uses-div")[0];
