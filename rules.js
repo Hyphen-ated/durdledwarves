@@ -348,7 +348,7 @@ rules: [
 ]
 }
 
-var rule_definitions = original_definitions;
+var current_rule_definitions = original_definitions;
 
 //turn the rules into a list of which squares we care about and a list of which squares get changed
 function preprocessRules(rule_definitions) {
@@ -408,6 +408,25 @@ function preprocessRules(rule_definitions) {
 function deleteRule(rule_id) {
     var element = document.getElementById(rule_id);
     element.parentNode.removeChild(element);
+}
+
+function addRule() {
+    var new_rule = {   name: "New rule",
+
+                       pattern:"*****"+
+                               "*****"+
+                               "**O**"+
+                               "*****"+
+                               "*****",
+
+                       outcome:"*****"+
+                               "*****"+
+                               "*****"+
+                               "*****"+
+                               "*****"
+                   };
+    current_rule_definitions.rules.push(new_rule);
+    populatePageWithRules(current_rule_definitions);
 }
 
 function populatePageWithRules(rule_definitions) {
@@ -519,7 +538,7 @@ function applyRuleChanges() {
     var new_rules = preprocessRules(new_definitions);
     if (new_rules != null) {
         rules = new_rules;
-        rule_definitions = new_definitions;
+        current_rule_definitions = new_definitions;
         hist.latest_idx = hist.curr_idx;
         setRuleErrorMsg("");
         renumberRules();
@@ -543,12 +562,12 @@ function setRuleErrorMsg(msg) {
 
 function dumpRules() {
     var rulezone = document.getElementById("rulezone");
-    var rule_json = JSON.stringify(rule_definitions);
+    var rule_json = JSON.stringify(current_rule_definitions);
     rulezone.value = rule_json;
 }
 
 function getCompressedRuleText() {
-    var rule_json = JSON.stringify(rule_definitions);
+    var rule_json = JSON.stringify(current_rule_definitions);
     return LZString.compressToBase64(rule_json);
 }
 

@@ -347,7 +347,7 @@ function loadWorld() {
 function makeLinkToWorldAndRules() {
     var baseurl = window.location.href.split('#')[0];
     var link = baseurl + "#world=" + getCompressedWorldText();
-    if (rule_definitions !== original_definitions) {
+    if (current_rule_definitions !== original_definitions) {
         link = link + ",rules=" + getCompressedRuleText();
     }
     return link;
