@@ -22,6 +22,7 @@ for(var x = 0; x < w; ++x) {
         current_world[x][y] = id['_'];
     }
 }
+current_world.gen = 0;
 var template_buffer = new Array(w);
 for(var x = 0; x < w; ++x) {
     template_buffer[x] = new Array(h);
@@ -35,9 +36,8 @@ var hist = {
     buffer: new Array(1000),
     curr_idx: 0, //the index into buffer where current_state goes
     earliest_idx: 0, // chronologically earliest of the states in buffer
-    latest_idx: 0, // chronologically latest of the states in buffer
+    latest_idx: 0 // chronologically latest of the states in buffer
     //the current state can be different from the latest state if we're doing rewinding
-    curr_gen_number: 0
 
 }
 

@@ -5,6 +5,8 @@ var frameskip = 0;
 var frame_delay = 0;
 var show_uses = true;
 
+var population_history = [];
+
 var canvas = document.getElementById('canvas');
 canvas.width = w * cell_size;
 canvas.height = h * cell_size;
@@ -144,17 +146,23 @@ function applyTemplate(old_world, new_world, new_template) {
 // find all the dwarves in the world and apply the rules for each one, returning a new world
 // to avoid excessive allocations, also takes existing 2d arrays for the new world and for a template scratch space
 function advanceWorld(old_world, new_world_buffer, new_template_buffer) {
+    var population = 0;
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             var letter = current_world[x][y];
             if (letter == id["G"] || letter == id["D"]) {
                 var dwarf = {x: x, y: y, letter: letter};
                 advanceDwarf(dwarf, old_world, new_template_buffer);
+                ++population;
             }
         }
     }
 
     applyTemplate(old_world, new_world_buffer, new_template_buffer);
+    new_world_buffer.gen = old_world.gen + 1;
+
+    population_history[new_world_buffer.gen] = population;
+
     return new_world_buffer;
 }
 
@@ -180,6 +188,11 @@ function drawWorld() {
             var letter = current_world[x][y];
             drawCell(x, y, letter);
         }
+    }
+
+    var generation_display = document.getElementById("generation-num");
+    if(generation_display) {
+        generation_display.innerHTML = current_world.gen;
     }
 
     if (show_uses) {
@@ -307,6 +320,13 @@ function doShareLink() {
     sharezone.value = makeLinkToWorldAndRules();
     sharezone.select();
 
+}
+
+function showPopulationHistory() {
+    var historyzone = document.getElementById("historyzone");
+    historyzone.value = population_history.join("\n");
+    historyzone.rows = 3;
+    historyzone.style.visibility = "visible";
 }
 
 function clearWorld() {

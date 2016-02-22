@@ -22,6 +22,18 @@
     float: left;
 }
 
+#generation-label-span
+{
+    background-color: #FEFEFE;
+    display: inline-block;
+    min-width: 75px;
+}
+
+#historyzone
+{
+    visibility: hidden;
+}
+
 #rules
 {
     float: left;

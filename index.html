@@ -14,6 +14,7 @@
     <button type="button" id="pause" onclick="togglePause()">Pause/unpause</button>
     <button type="button" id="prev" onclick="previousState()">Prev</button>
     <button type="button" id="next" onclick="nextState()">Next</button>
+    <span id="generation-label-span">Gen: <span id="generation-num">0</span></span>
     Frameskip: <input id="frameskip" type="number" value="0" onchange="updateFrameskip()">
     Frame delay (ms): <input id="framedelay" type="number" value="0" onchange="updateFrameDelay()">
     <button type="button" id="restart" onclick="setUpInitialWorld()">Restart</button>
@@ -34,7 +35,9 @@
 
     <textarea id="textzone" rows="3" cols="40"></textarea><br>
     <button type="button" id="sharelink" onclick="doShareLink()">Make Share Link</button>
-    <textarea id="sharezone" rows="1" cols="40"></textarea>
+    <textarea id="sharezone" rows="1" cols="40"></textarea><br>
+    <button type="button" id="get-population-history" onclick="showPopulationHistory()">Show Population History</button>
+    <textarea id="historyzone" rows="1" cols="40"></textarea><br>
     <p>This is Hyphen-ated's implementation of <a href="https://forums.goodgamery.com/viewtopic.php?f=8&t=6060">Durdle Dwarves, by paz.</a></p>
 
 </div>
