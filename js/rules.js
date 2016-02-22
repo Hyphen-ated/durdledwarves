@@ -552,7 +552,7 @@ function renumberRules() {
         var rule_div = rule_divs[i];
         var uses_div = rule_div.getElementsByClassName("uses-div")[0];
         var uses_counter = uses_div.getElementsByClassName("uses-counter")[0];
-        uses_counter.id = "uses_counter" + i;
+        uses_counter.id = "uses-counter" + i;
     }
 }
 
