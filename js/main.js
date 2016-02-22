@@ -1,43 +1,9 @@
 //durdle dwarves, a cellular automaton
 
-
-function wrap(a, size) {
-    return (a + size) % size;
-}
-
-
-var id = {
-    "_": 1, //blank space
-    "S": 2, //stone
-    "D": 3, //dwarf
-    "G": 4, //green dwarf (initially present or manually placed)
-    "*": 5, // for rules: anything
-    "X": 6, // for rules: not blank space
-    "s": 7, // for rules: not stone
-    "d": 8,  // for rules: not dwarf
-    "O": 9 //for rules: the acting dwarf
-}
-//some nice little global state
-var w = 180;
-var h = 180;
-var cell_size = 5;
 var paused = true;
 var frameskip = 0;
 var frame_delay = 0;
-var showUses = true;
-
-var current_world = new Array(w);
-for(var x = 0; x < w; ++x) {
-    current_world[x] = new Array(h);
-    for (var y = 0; y < h; ++y) {
-        current_world[x][y] = id['_'];
-    }
-}
-var template_buffer = new Array(w);
-for(var x = 0; x < w; ++x) {
-    template_buffer[x] = new Array(h);
-    template_buffer[x].fill(null);
-}
+var show_uses = true;
 
 var canvas = document.getElementById('canvas');
 canvas.width = w * cell_size;
@@ -45,7 +11,7 @@ canvas.height = h * cell_size;
 var slider = document.getElementById('slider');
 var ctx = canvas.getContext('2d');
 
-function clicked(event) {
+function drawAtCursor(event) {
     //clicking modifies the world, but only when paused.
     if(!paused) {
         return;
@@ -60,19 +26,20 @@ function clicked(event) {
 
     hist.latest_idx = hist.curr_idx;
 }
-canvas.addEventListener('click', clicked, false);
+canvas.addEventListener('click', drawAtCursor, false);
+// this stops click-drag from making the browser try to do text selection (so it doesn't mess with our drawing)
 canvas.onmousedown = function(event) { event.preventDefault();};
 
 //when they move the mouse, if they're holding click, then draw like they clicked
 function mouseMove(event) {
     if (event.which == 1) {
-        clicked(event);
+        drawAtCursor(event);
     }
 }
 canvas.onmousemove = mouseMove;
 
+// little optimization, we look up into this table instead of doing a bunch of nested if checks
 cell_matching_table = {};
-//cell_matching_table[cell_contents][rule_contents]
 cell_matching_table[id['G']] = {}
 cell_matching_table[id['G']][id["_"]] = false,
 cell_matching_table[id['G']][id["S"]] = false,
@@ -99,6 +66,7 @@ cell_matching_table[id['_']][id["X"]] = false,
 cell_matching_table[id['_']][id["s"]] = true,
 cell_matching_table[id['_']][id["d"]] = true
 
+// checks to see if what's actually present in the world matches what a rule is looking for
 function cellMatchesRule(cell_contents, rule_contents) {
     return cell_matching_table[cell_contents][rule_contents]
 }
@@ -117,6 +85,7 @@ function ruleTriggered(rule, dwarf, old_world) {
     return true;
 }
 
+// when multiple rules try to draw to a new location, dwarves get priority, then stone
 function priority(a, b) {
     if (a == id['G'] || b == id['G']) return id['G'];
     if (a == id['D'] || b == id['D']) return id['D'];
@@ -124,6 +93,7 @@ function priority(a, b) {
     return id['_'];
 }
 
+// we've determined that this dwarf is performing this rule, so write what he's doing into the template
 function applyOutcome(rule, dwarf, new_template) {
     //each rule has a list of outcomes to apply
     for (var i = 0; i < rule.outcome.length; ++i) {
@@ -132,6 +102,8 @@ function applyOutcome(rule, dwarf, new_template) {
         var grid_y = wrap(dwarf.y + new_cell.y, h);
         var new_letter = new_cell.val;
 
+        // O is a special symbol in rules that means "the dwarf performing the rule moves here"
+        // that dwarf might have been a G or D (green or normal)
         if (new_letter == id['O']) {
             new_letter = dwarf.letter;
         }
@@ -141,6 +113,7 @@ function applyOutcome(rule, dwarf, new_template) {
     rule.uses++;
 }
 
+//figure out what this dwarf is going to do
 function advanceDwarf(dwarf, old_world, new_template) {
     for (var i = 0; i < rules.length; ++i) {
         var rule = rules[i];
@@ -151,6 +124,8 @@ function advanceDwarf(dwarf, old_world, new_template) {
     }
 }
 
+//once all the dwarves have written their actions into a template,
+//we write it on top of the old worldstate to get the new worldstate
 function applyTemplate(old_world, new_world, new_template) {
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
@@ -160,22 +135,30 @@ function applyTemplate(old_world, new_world, new_template) {
             } else {
                 new_world[x][y] = old_world[x][y];
             }
+            //to save a little time, we clear out the template now to re-use it again
             new_template[x][y] = null;
         }
     }
 }
 
-
-function makeNewWorld(dwarves, old_world, new_world, new_template) {
-    for (var i = 0; i < dwarves.length; ++i) {
-        advanceDwarf(dwarves[i], old_world, new_template);
+// find all the dwarves in the world and apply the rules for each one, returning a new world
+// to avoid excessive allocations, also takes existing 2d arrays for the new world and for a template scratch space
+function advanceWorld(old_world, new_world_buffer, new_template_buffer) {
+    for (var x = 0; x < w; ++x) {
+        for (var y = 0; y < h; ++y) {
+            var letter = current_world[x][y];
+            if (letter == id["G"] || letter == id["D"]) {
+                var dwarf = {x: x, y: y, letter: letter};
+                advanceDwarf(dwarf, old_world, new_template_buffer);
+            }
+        }
     }
-    applyTemplate(old_world, new_world, new_template);
-    return new_world;
+
+    applyTemplate(old_world, new_world_buffer, new_template_buffer);
+    return new_world_buffer;
 }
 
 var colorsByLetter = {};
-
 colorsByLetter[id["G"]] = "#00FF99";
 colorsByLetter[id["D"]] = "#FF9900";
 colorsByLetter[id["_"]] = "#050505";
@@ -199,7 +182,7 @@ function drawWorld() {
         }
     }
 
-    if (showUses) {
+    if (show_uses) {
         for (var i = 0; i < rules.length; ++i ) {
             var rule = rules[i];
             var uses_counter = document.getElementById("uses-counter" + i);
@@ -210,39 +193,10 @@ function drawWorld() {
     }
 }
 
-// manually handle a circular buffer for history
-var hist = {
-    size: 1000,
-    buffer: new Array(1000),
-    curr_idx: 0, //the index into buffer where current_state goes
-    earliest_idx: 0, // chronologically earliest of the states in buffer
-    latest_idx: 0, // chronologically latest of the states in buffer
-    //the current state can be different from the latest state if we're doing rewinding
-    curr_gen_number: 0
-}
-
-//initialize all the world buffers to be 2d arrays, w x h in size
-for(var i = 0; i < hist.size; ++i) {
-    hist.buffer[i] = new Array(w);
-    for (var j = 0; j < w; ++j) {
-        hist.buffer[i][j] = new Array(h);
-    }
-}
 
 var time_since_render = 9999;
 function update() {
-    dwarves = [];
-    for (var x = 0; x < w; ++x) {
-        for (var y = 0; y < h; ++y) {
-            var letter = current_world[x][y];
-            if (letter == id["G"] || letter == id["D"]) {
-                dwarves.push({"x": x, "y": y, "letter": letter});
-            }
-        }
-    }
-
     hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
-
 
     hist.latest_idx = hist.curr_idx;
     if (hist.curr_idx == hist.earliest_idx) {
@@ -250,7 +204,8 @@ function update() {
     }
 
     var new_world_buffer = hist.buffer[hist.curr_idx];
-    current_world = makeNewWorld(dwarves, current_world, new_world_buffer, template_buffer);
+
+    current_world = advanceWorld(current_world, new_world_buffer, template_buffer);
     hist.buffer[hist.curr_idx] = current_world;
 
     if (time_since_render > frameskip) {

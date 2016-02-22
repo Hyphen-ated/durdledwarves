@@ -23,3 +23,8 @@ var getHashValue = function(key) {
     }
     return null;
 };
+
+
+function wrap(a, size) {
+    return (a + size) % size;
+}
