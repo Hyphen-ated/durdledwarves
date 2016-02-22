@@ -38,7 +38,46 @@ var hist = {
     latest_idx: 0, // chronologically latest of the states in buffer
     //the current state can be different from the latest state if we're doing rewinding
     curr_gen_number: 0
+
 }
+
+hist.currentlyOnLatestWorld = function() {
+    return this.curr_idx == this.latest_idx;
+}
+
+hist.getNextWorld = function() {
+    this.curr_idx = wrap(this.curr_idx + 1, this.size);
+
+    //we've wrapped around to use this entire circular buffer, so we're reusing the oldest state for the newest one
+    if (this.curr_idx == this.earliest_idx) {
+        this.earliest_idx = wrap(this.earliest_idx + 1, this.size);
+    }
+
+    return this.buffer[this.curr_idx];
+}
+
+hist.getPreviousWorld = function() {
+    if (this.curr_idx == this.earliest_idx) {
+        return null;
+    }
+    this.curr_idx = wrap(this.curr_idx - 1, this.size);
+    return this.buffer[this.curr_idx];
+}
+
+hist.setCurrentWorld = function(current_world) {
+    this.latest_idx = this.curr_idx;
+    this.buffer[this.curr_idx] = current_world;
+}
+
+hist.countHistoryStates = function() {
+    return wrap(this.size - this.earliest_idx, this.size) + this.curr_idx;
+}
+
+hist.makeWorldAtIndexCurrent = function(slider_index) {
+  this.curr_idx = wrap(this.earliest_idx + slider_index, this.size);
+  return this.buffer[this.curr_idx];
+}
+
 
 //initialize all the world buffers to be 2d arrays, w x h in size
 for(var i = 0; i < hist.size; ++i) {

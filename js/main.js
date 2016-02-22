@@ -196,17 +196,10 @@ function drawWorld() {
 
 var time_since_render = 9999;
 function update() {
-    hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
-
-    hist.latest_idx = hist.curr_idx;
-    if (hist.curr_idx == hist.earliest_idx) {
-        hist.earliest_idx = wrap(hist.earliest_idx + 1, hist.size);
-    }
-
-    var new_world_buffer = hist.buffer[hist.curr_idx];
-
+    //get buffer from history to store the world, figure out what the world is, then put it into the history
+    var new_world_buffer = hist.getNextWorld();
     current_world = advanceWorld(current_world, new_world_buffer, template_buffer);
-    hist.buffer[hist.curr_idx] = current_world;
+    hist.setCurrentWorld(current_world);
 
     if (time_since_render > frameskip) {
         drawWorld();
@@ -215,8 +208,7 @@ function update() {
         ++time_since_render;
     }
 
-
-    slider.max = wrap(hist.size - hist.earliest_idx, hist.size) + hist.curr_idx;
+    slider.max = hist.countHistoryStates()
     slider.value = slider.max;
 
     if(!paused) {
@@ -237,11 +229,14 @@ function togglePause() {
 
 
 function previousState() {
-    if(!paused || hist.curr_idx == hist.earliest_idx) {
+    if(!paused) {
         return;
     }
-    hist.curr_idx = wrap(hist.curr_idx - 1, hist.size);
-    current_world = hist.buffer[hist.curr_idx];
+    var world = hist.getPreviousWorld();
+    if(!world) {
+        return;
+    }
+    current_world = world;
     slider.value--;
     drawWorld();
 }
@@ -251,21 +246,20 @@ function nextState() {
         return;
     }
     //if we have no more precomputed history to advance, then compute a new state
-    if(hist.curr_idx == hist.latest_idx) {
+    if(hist.currentlyOnLatestWorld()) {
         //force it to be rendered
         time_since_render = 9999;
         update();
         return;
     }
-    hist.curr_idx = wrap(hist.curr_idx + 1, hist.size);
-    current_world = hist.buffer[hist.curr_idx];
+
+    current_world = hist.getNextWorld();
     slider.value++;
     drawWorld();
 }
 
 function sliderChange() {
-    hist.curr_idx = wrap(hist.earliest_idx + parseInt(slider.value), hist.size);
-    current_world = hist.buffer[hist.curr_idx];
+    current_world = hist.makeWorldAtIndexCurrent(parseInt(slider.value))
     drawWorld();
 }
 
@@ -295,7 +289,7 @@ function loadWorld() {
     var compressed = textzone.value;
     var world_json = LZString.decompressFromBase64(compressed);
     current_world = JSON.parse(world_json);
-    hist.latest_idx = hist.curr_idx;
+    hist.setCurrentWorld(current_world);
     drawWorld();
 }
 
