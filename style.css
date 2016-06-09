@@ -125,6 +125,7 @@
     background-color: #FDE5C8;
     padding: 10px;
     margin: 10px;
+    width: 50%;
 }
 
 #click-controls
@@ -133,4 +134,5 @@
     background-color: #CDEFFE;
     padding: 10px;
     margin: 10px;
+    width: 50%;
 }
