@@ -11,30 +11,34 @@
         You need a browser with support for the canvas element to see this thing, and you aren't using one
     </canvas>
     <br>
+    <input type="range" class="slider-width" id="slider" min="0" max="0" oninput="sliderChange()">
+    <br>
     <button type="button" id="pause" onclick="togglePause()">Start/Pause</button>
     <button type="button" id="prev" onclick="previousState()">Prev</button>
     <button type="button" id="next" onclick="nextState()">Next</button>
     <span id="generation-label-span">Gen: <span id="generation-num">0</span></span>
-    Frameskip: <input id="frameskip" type="number" value="0" onchange="updateFrameskip()">
-    Frame delay (ms): <input id="framedelay" type="number" value="0" onchange="updateFrameDelay()">
     <button type="button" id="restart" onclick="setUpInitialWorld()">Restart</button>
     <button type="button" id="clear" onclick="clearWorld()">Clear</button>
     <br>
-    <input type="range" class="slider-width" id="slider" min="0" max="0" oninput="sliderChange()"><br>
-
-    clicking gives:<br>
-    <input type="radio" name="clickAddition" id="dwarf" value="G" checked>
-    <label for="dwarf">Dwarf</label><br>
-    <input type="radio" name="clickAddition" id="stone" value="S">
-    <label for="stone">Stone</label><br>
-    <input type="radio" name="clickAddition" id="space" value="_">
-    <label for="space">Empty space</label><br>
-
+    <div id="speed-controls">
+        Frameskip (to go faster): <input id="frameskip" type="number" value="0" onchange="updateFrameskip()">
+        <br>
+        Frame delay (in ms, to go slower): <input id="framedelay" type="number" value="0" onchange="updateFrameDelay()">
+    </div>
+    <div id="click-controls">
+        clicking gives:<br>
+        <input type="radio" name="clickAddition" id="dwarf" value="G" checked>
+        <label for="dwarf">Dwarf</label><br>
+        <input type="radio" name="clickAddition" id="stone" value="S">
+        <label for="stone">Stone</label><br>
+        <input type="radio" name="clickAddition" id="space" value="_">
+        <label for="space">Empty space</label><br>
+    </div>
     <button type="button" id="dumpworld" onclick="dumpWorld()">Dump World State</button>
     <button type="button" id="loadworld" onclick="loadWorld()">Load World State</button><br>
 
     <textarea id="textzone" rows="3" cols="40"></textarea><br>
-    <button type="button" id="sharelink" onclick="doShareLink()">Make Share Link</button>
+    <button type="button" id="sharelink" onclick="doShareLink()">Make Share Link For Current Rules And State</button>
     <textarea id="sharezone" rows="1" cols="40"></textarea><br>
     <button type="button" id="get-population-history" onclick="showPopulationHistory()">Show Population History</button>
     <textarea id="historyzone" rows="1" cols="40"></textarea><br>

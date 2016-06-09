@@ -118,3 +118,19 @@
 {
     font-size: 150%;
 }
+
+#speed-controls
+{
+    border-radius: 10px;
+    background-color: #FDE5C8;
+    padding: 10px;
+    margin: 10px;
+}
+
+#click-controls
+{
+    border-radius: 10px;
+    background-color: #CDEFFE;
+    padding: 10px;
+    margin: 10px;
+}
