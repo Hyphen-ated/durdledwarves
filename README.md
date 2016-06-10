@@ -1,6 +1,6 @@
 # durdledwarves
-This guy Paz made a cool cellular automaton: https://forums.goodgamery.com/viewtopic.php?f=8&t=6060
+This guy Stan Patton made a cool cellular automaton, and I made this javascript version of it.
 
-I made this javascript version of it. The big features I added are a draggable timeline slider to go back and forward in time, and a UI to change the rules dynamically.
+The big features I added are a draggable timeline slider to go back and forward in time, and a UI to change the rules dynamically.
 
 Usable here: http://hyphen-ated.github.io/durdledwarves/
