@@ -13,29 +13,50 @@ canvas.height = h * cell_size;
 var slider = document.getElementById('slider');
 var ctx = canvas.getContext('2d');
 
-function drawAtCursor(event) {
-    //clicking modifies the world, but only when paused.
-    if(!paused) {
-        return;
-    }
-    var pos = canvas.relMouseCoords(event);
-    var x = Math.floor(pos.x / cell_size);
-    var y = Math.floor(pos.y / cell_size);
-    var val = $('input[name=clickAddition]:checked').val();
-    var val_id = id[val];
+var lastSettingX = null;
+var lastSettingY = null;
+
+function setSingleSquareFromCursor(x, y, val_id) {
     current_world[x][y] = val_id;
     drawCell(x, y, val_id);
-
-    hist.latest_idx = hist.curr_idx;
 }
-canvas.addEventListener('click', drawAtCursor, false);
-// this stops click-drag from making the browser try to do text selection (so it doesn't mess with our drawing)
-canvas.onmousedown = function(event) { event.preventDefault();};
+function setAtCursor(event) {
+    //clicking modifies the world, but only when paused.
+    if(paused) {
+
+        var pos = canvas.relMouseCoords(event);
+
+        var x = Math.floor(pos.x / cell_size);
+        var y = Math.floor(pos.y / cell_size);
+        var val = $('input[name=clickAddition]:checked').val();
+        var val_id = id[val];
+        //draw a line between the previous location and this one, so there aren't gaps if you drag quickly when drawing
+        if(lastSettingX != null) {
+            bresenhamLine(x, y, lastSettingX, lastSettingY, val_id, setSingleSquareFromCursor)
+        } else {
+            setSingleSquareFromCursor(x, y, val_id);
+        }
+
+        hist.latest_idx = hist.curr_idx;
+        lastSettingX = x;
+        lastSettingY = y;
+    }
+}
+
+
+canvas.addEventListener('click', setAtCursor, false);
+canvas.onmousedown = function(event) {
+    // this stops click-drag from making the browser try to do text selection (so it doesn't mess with our drawing)
+    event.preventDefault();
+    //and if we just had a mousedown, that means we're done with any previous drawing
+    lastSettingX = null;
+    lastSettingY = null;
+};
 
 //when they move the mouse, if they're holding click, then draw like they clicked
 function mouseMove(event) {
     if (event.which == 1) {
-        drawAtCursor(event);
+        setAtCursor(event);
     }
 }
 canvas.onmousemove = mouseMove;
