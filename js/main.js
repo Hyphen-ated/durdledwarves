@@ -174,10 +174,8 @@ colorsByLetter[id["S"]] = "#999999";
 
 
 function drawCell(x, y, letter) {
-    if(letter != id["_"]) {
-        ctx.fillStyle = colorsByLetter[letter];
-        ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
-    }
+    ctx.fillStyle = colorsByLetter[letter];
+    ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
 }
 
 function drawWorld() {
@@ -186,7 +184,9 @@ function drawWorld() {
     for (var x = 0; x < w; ++x) {
         for (var y = 0; y < h; ++y) {
             var letter = current_world[x][y];
-            drawCell(x, y, letter);
+            if(letter != id["_"]) {
+                drawCell(x, y, letter);
+            }
         }
     }
 
