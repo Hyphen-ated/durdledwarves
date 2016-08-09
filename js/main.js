@@ -302,6 +302,9 @@ function loadWorld() {
     var compressed = textzone.value;
     var world_json = LZString.decompressFromBase64(compressed);
     current_world = JSON.parse(world_json);
+    if(!current_world.gen) {
+        current_world.gen = 0;
+    }
     hist.setCurrentWorld(current_world);
     drawWorld();
 }
