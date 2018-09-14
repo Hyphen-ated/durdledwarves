@@ -55,7 +55,7 @@ canvas.onmousedown = function(event) {
 
 //when they move the mouse, if they're holding click, then draw like they clicked
 function mouseMove(event) {
-    if (event.which == 1) {
+    if (event.buttons == 1) {
         setAtCursor(event);
     }
 }
