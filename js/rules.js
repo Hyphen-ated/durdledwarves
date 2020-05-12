@@ -483,7 +483,7 @@ function populatePageWithRules(rule_definitions) {
         pattern_textarea.className = "rule-textarea pattern-textarea";
         pattern_textarea.name = "pattern";
         pattern_textarea.rows = "5";
-        pattern_textarea.cols = "4";
+        pattern_textarea.cols = "5";
         pattern_textarea.innerHTML = rule_defn.pattern;
         rule_div.appendChild(pattern_textarea);
 
@@ -496,7 +496,7 @@ function populatePageWithRules(rule_definitions) {
         outcome_textarea.className = "rule-textarea outcome-textarea";
         outcome_textarea.name = "outcome";
         outcome_textarea.rows = "5";
-        outcome_textarea.cols = "4";
+        outcome_textarea.cols = "5";
         outcome_textarea.innerHTML = rule_defn.outcome;
         rule_div.appendChild(outcome_textarea);
 
